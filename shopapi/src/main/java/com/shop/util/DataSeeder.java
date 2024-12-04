@@ -34,11 +34,11 @@ public class DataSeeder {
     private ProductRepository productRepository;
     private BCryptPasswordEncoder passwordEncoder;
 
-    public void seedUsers(int max) {
+    public void seedDatabase(int max) {
         Faker faker = new Faker(new Locale("en-US"));
 
-        Role role1 = Role.builder().name("ADMIN").build();
-        Role role2 = Role.builder().name("USER").build();
+        Role role1 = Role.builder().name("ROLE_ADMIN").build();
+        Role role2 = Role.builder().name("ROLE_USER").build();
         roleRepository.saveAll(Arrays.asList(role1, role2));
 
 
@@ -53,9 +53,9 @@ public class DataSeeder {
         CompletableFuture<Void> usersFuture = CompletableFuture.runAsync(() -> {
             log.info("Seeding users started...");
 
-			Role adminRole = roleRepository.findByName("ADMIN")
+			Role adminRole = roleRepository.findByName("ROLE_ADMIN")
 					.orElseThrow(() -> new RuntimeException("Admin role not found"));
-			Role userRole = roleRepository.findByName("USER")
+			Role userRole = roleRepository.findByName("ROLE_USER")
 					.orElseThrow(() -> new RuntimeException("User role not found"));
 
             List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in hashing the passwords
