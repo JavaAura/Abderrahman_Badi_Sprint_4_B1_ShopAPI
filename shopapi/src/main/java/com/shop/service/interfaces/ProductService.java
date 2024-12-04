@@ -1,6 +1,7 @@
 package com.shop.service.interfaces;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.shop.dto.product.ProductDTO;
 
@@ -15,9 +16,9 @@ public interface ProductService {
 
    ProductDTO getProductById(long id, String... with);
 
-   Page<ProductDTO> getAllProducts();
+   Page<ProductDTO> getAllProducts(Pageable pageable, String search);
 
-   Page<ProductDTO> getAllProducts(String... with);
+   Page<ProductDTO> getAllProducts(Pageable pageable, String search, String... with);
 
    ProductDTO addProduct(ProductDTO Product);
 

@@ -1,10 +1,10 @@
 package com.shop.service;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.shop.dto.product.ProductDTO;
@@ -28,10 +28,10 @@ import lombok.extern.log4j.Log4j2;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    private ProductRepository ProductRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    private ProductMapper ProductMapper;
+    private ProductMapper productMapper;
 
     @Override
     public ProductDTO getProductById(long id) {
@@ -46,13 +46,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDTO> getAllProducts() {
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String search) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }
 
     @Override
-    public Page<ProductDTO> getAllProducts(String... with) {
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String search, String... with) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }
