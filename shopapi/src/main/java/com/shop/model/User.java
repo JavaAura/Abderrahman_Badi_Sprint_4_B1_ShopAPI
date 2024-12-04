@@ -44,6 +44,9 @@ public class User {
 
     private String password;
 
+    @Builder.Default
+    private boolean isEnabled = true;
+
     @Column(unique = true)
     private String email;
 

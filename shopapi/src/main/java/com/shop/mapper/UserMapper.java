@@ -11,10 +11,17 @@ import com.shop.dto.user.UserDTO;
 import com.shop.exceptions.InvalidDataException;
 import com.shop.model.Role;
 import com.shop.model.User;
+import com.shop.service.interfaces.RoleService;
 
 @Component
 public class UserMapper {
     private final List<String> VALID_INCLUDES = Arrays.asList("role");
+
+    private RoleService roleService;
+
+    public UserMapper(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     public void verifyIncludes(String... with)
             throws InvalidDataException {
@@ -28,11 +35,13 @@ public class UserMapper {
     }
 
     public User convertToEntity(UserDTO userDTO) {
+        Role role = roleService.getRoleById(userDTO.getRole().getId());
+
         return User.builder()
                 .email(userDTO.getEmail())
                 .userName(userDTO.getUserName())
                 .password(userDTO.getPassword())
-                .role(Role.builder().id(userDTO.getRoleId()).build())
+                .role(role)
                 .build();
     }
 
@@ -40,7 +49,6 @@ public class UserMapper {
         return UserDTO.builder()
                 .email(user.getEmail())
                 .userName(user.getUserName())
-                .password(user.getPassword())
                 .build();
     }
 
@@ -55,7 +63,7 @@ public class UserMapper {
 
         RoleDTO roleDTO = null;
 
-        if (includesList.contains("category")) {
+        if (includesList.contains("role")) {
             Role role = user.getRole();
             roleDTO = RoleDTO.builder()
                     .name(role.getName())
@@ -65,7 +73,6 @@ public class UserMapper {
         return UserDTO.builder()
                 .email(user.getEmail())
                 .userName(user.getUserName())
-                .password(user.getPassword())
                 .role(roleDTO)
                 .build();
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.shop.dto.product.ProductDTO;
@@ -45,13 +46,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> getAllProducts() {
+    public Page<ProductDTO> getAllProducts() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }
 
     @Override
-    public List<ProductDTO> getAllProducts(String... with) {
+    public Page<ProductDTO> getAllProducts(String... with) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }

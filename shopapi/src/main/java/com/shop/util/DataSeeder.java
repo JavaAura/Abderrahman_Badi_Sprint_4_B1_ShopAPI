@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class Seeder implements CommandLineRunner {
+public class DataSeeder {
 
     private RoleRepository roleRepository;
     private UserRepository userRepository;
@@ -35,14 +34,14 @@ public class Seeder implements CommandLineRunner {
     private ProductRepository productRepository;
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Override
-    public void run(String... args) throws Exception {
-        int max = 100;
+    public void seedDatabase(int max) {
         Faker faker = new Faker(new Locale("en-US"));
 
-        Role role1 = Role.builder().name("admin").build();
-        Role role2 = Role.builder().name("user").build();
+        Role role1 = Role.builder().name("ROLE_ADMIN").build();
+        Role role2 = Role.builder().name("ROLE_USER").build();
         roleRepository.saveAll(Arrays.asList(role1, role2));
+
+
 
         Instant start = Instant.now();
         List<Category> categories = IntStream.range(0, max).mapToObj(i -> Category.builder()
@@ -53,12 +52,18 @@ public class Seeder implements CommandLineRunner {
 
         CompletableFuture<Void> usersFuture = CompletableFuture.runAsync(() -> {
             log.info("Seeding users started...");
+
+			Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+					.orElseThrow(() -> new RuntimeException("Admin role not found"));
+			Role userRole = roleRepository.findByName("ROLE_USER")
+					.orElseThrow(() -> new RuntimeException("User role not found"));
+
             List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in hashing the passwords
                     .mapToObj(i -> User.builder()
                             .email(faker.internet().emailAddress())
                             .userName(faker.name().username())
                             .password(passwordEncoder.encode("password")) // Expensive operation
-                            .role(i == 0 ? role1 : role2) // First user is admin
+                            .role(i == 0 ? adminRole : userRole) // First user is admin
                             .build())
                     .collect(Collectors.toList());
             userRepository.saveAll(users);

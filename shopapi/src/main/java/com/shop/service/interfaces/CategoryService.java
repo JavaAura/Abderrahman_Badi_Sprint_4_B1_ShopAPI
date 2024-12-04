@@ -1,6 +1,6 @@
 package com.shop.service.interfaces;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import com.shop.dto.category.CategoryDTO;
 
@@ -14,9 +14,9 @@ public interface CategoryService {
 
    CategoryDTO getCategoryById(long id, String... with);
 
-   List<CategoryDTO> getAllCategorys();
+   Page<CategoryDTO> getAllCategorys();
 
-   List<CategoryDTO> getAllCategorys(String... with);
+   Page<CategoryDTO> getAllCategorys(String... with);
 
    CategoryDTO addCategory(CategoryDTO Category);
 

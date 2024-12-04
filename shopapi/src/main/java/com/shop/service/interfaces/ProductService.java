@@ -1,6 +1,6 @@
 package com.shop.service.interfaces;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import com.shop.dto.product.ProductDTO;
 
@@ -15,9 +15,9 @@ public interface ProductService {
 
    ProductDTO getProductById(long id, String... with);
 
-   List<ProductDTO> getAllProducts();
+   Page<ProductDTO> getAllProducts();
 
-   List<ProductDTO> getAllProducts(String... with);
+   Page<ProductDTO> getAllProducts(String... with);
 
    ProductDTO addProduct(ProductDTO Product);
 

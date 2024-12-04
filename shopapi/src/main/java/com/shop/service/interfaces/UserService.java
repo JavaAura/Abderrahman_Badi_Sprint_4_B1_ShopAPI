@@ -1,7 +1,9 @@
 package com.shop.service.interfaces;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import com.shop.dto.user.UpdateUserDTO;
 import com.shop.dto.user.UserDTO;
 
 /**
@@ -14,14 +16,15 @@ public interface UserService {
 
    UserDTO getUserById(long id, String... with);
 
-   List<UserDTO> getAllUsers();
+   public UserDTO getByUserName(String userName);
 
-   List<UserDTO> getAllUsers(String... with);
+   Page<UserDTO> getAllUsers(Pageable pageable);
+
+   Page<UserDTO> getAllUsers(Pageable pageable, String... with);
 
    UserDTO addUser(UserDTO User);
 
-   public UserDTO updateUser(long UserId, UserDTO User);
+   public UserDTO updateUser(long UserId, UpdateUserDTO User, String... with);
 
    public void deleteUserById(long UserId);
-
 }

@@ -1,19 +1,17 @@
 package com.shop.service;
 
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.shop.dto.product.ProductDTO;
+import com.shop.dto.user.UpdateUserDTO;
 import com.shop.dto.user.UserDTO;
-import com.shop.exceptions.InvalidDataException;
 import com.shop.exceptions.ResourceNotFoundException;
-import com.shop.mapper.ProductMapper;
 import com.shop.mapper.UserMapper;
-import com.shop.model.Product;
-import com.shop.repository.ProductRepository;
+import com.shop.model.Role;
+import com.shop.model.User;
+import com.shop.repository.RoleRepository;
 import com.shop.repository.UserRepository;
 import com.shop.service.interfaces.UserService;
 
@@ -30,49 +28,71 @@ import lombok.extern.log4j.Log4j2;
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
-
+    private RoleRepository roleRepository;
+    private BCryptPasswordEncoder passwordEncoder;
     private UserMapper userMapper;
 
     @Override
-    public UserDTO getUserById(long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
+    public UserDTO getUserById(long id) throws ResourceNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found"));
+        return userMapper.convertToDTO(user);
     }
 
     @Override
     public UserDTO getUserById(long id, String... with) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
+        userMapper.verifyIncludes(with);
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found"));
+        return userMapper.convertToDTO(user, with);
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+    public UserDTO getByUserName(String userName) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
+        return userMapper.convertToDTO(user);
     }
 
     @Override
-    public List<UserDTO> getAllUsers(String... with) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+    public Page<UserDTO> getAllUsers(Pageable pageable, String... with) {
+        userMapper.verifyIncludes(with);
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(user -> userMapper.convertToDTO(user, with));
     }
 
     @Override
-    public UserDTO addUser(UserDTO User) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addUser'");
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(user -> userMapper.convertToDTO(user));
     }
 
     @Override
-    public UserDTO updateUser(long UserId, UserDTO User) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+    public UserDTO addUser(UserDTO userDTO) {
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User user = userMapper.convertToEntity(userDTO);
+        log.info("User : " + user);
+        return userMapper.convertToDTO(userRepository.save(user));
     }
 
     @Override
-    public void deleteUserById(long UserId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUserById'");
+    public UserDTO updateUser(long userId, UpdateUserDTO userDTO, String... with) {
+        userMapper.verifyIncludes(with);
+        User userDB = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
+
+        if (userDTO.getRole() != null) {
+            Role role = roleRepository.findById(userDTO.getRole().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+            userDB.setRole(role);
+        }
+
+        return userMapper.convertToDTO(userRepository.save(userDB), with);
+    }
+
+    @Override
+    public void deleteUserById(long UserId) throws ResourceNotFoundException {
+        User User = userRepository.findById(UserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        userRepository.delete(User);
     }
 
 }
