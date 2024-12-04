@@ -1,8 +1,13 @@
 package com.shop.util;
 
-import java.util.HashMap;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +21,12 @@ import com.shop.repository.ProductRepository;
 import com.shop.repository.RoleRepository;
 import com.shop.repository.UserRepository;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@AllArgsConstructor
+@Slf4j
 public class Seeder implements CommandLineRunner {
 
     private RoleRepository roleRepository;
@@ -25,52 +35,58 @@ public class Seeder implements CommandLineRunner {
     private ProductRepository productRepository;
     private BCryptPasswordEncoder passwordEncoder;
 
-    public Seeder(RoleRepository roleRepository, UserRepository userRepository, CategoryRepository categoryRepository,
-            ProductRepository productRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
-        this.productRepository = productRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
     public void run(String... args) throws Exception {
-        int max = 10;
+        int max = 100;
         Faker faker = new Faker(new Locale("en-US"));
-        HashMap<Integer, Role> mapRoles = new HashMap<>();
-        HashMap<Integer, User> mapUsers = new HashMap<>();
-        HashMap<Integer, Category> mapCategories = new HashMap<>();
-        HashMap<Integer, Product> mapProducts = new HashMap<>();
 
         Role role1 = Role.builder().name("admin").build();
         Role role2 = Role.builder().name("user").build();
+        roleRepository.saveAll(Arrays.asList(role1, role2));
 
-        mapRoles.put(1, role1);
-        mapRoles.put(2, role2);
+        Instant start = Instant.now();
+        List<Category> categories = IntStream.range(0, max).mapToObj(i -> Category.builder()
+                .name(faker.lorem().word())
+                .description(faker.lorem().sentence())
+                .build()).collect(Collectors.toList());
+        categoryRepository.saveAll(categories);
 
-        for (int i = 0; i < max; i++) {
-            User user = User.builder().email(faker.internet().emailAddress()).userName(faker.name().username())
-                    .password(passwordEncoder.encode("password")).role(i == 0 ? role1 : role2).build();
+        CompletableFuture<Void> usersFuture = CompletableFuture.runAsync(() -> {
+            log.info("Seeding users started...");
+            List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in hashing the passwords
+                    .mapToObj(i -> User.builder()
+                            .email(faker.internet().emailAddress())
+                            .userName(faker.name().username())
+                            .password(passwordEncoder.encode("password")) // Expensive operation
+                            .role(i == 0 ? role1 : role2) // First user is admin
+                            .build())
+                    .collect(Collectors.toList());
+            userRepository.saveAll(users);
 
-            Category category = Category.builder().name(faker.lorem().word()).description(faker.lorem().sentence())
-                    .build();
+            log.info("Seeding users completed");
+        });
 
-            mapUsers.put(i, user);
-            mapCategories.put(i, category);
-        }
+        CompletableFuture<Void> productsFuture = CompletableFuture.runAsync(() -> {
+            log.info("Seeding products started...");
+            Random random = new Random();
+            List<Product> products = IntStream.range(0, max)
+                    .mapToObj(i -> Product.builder()
+                            .designation(faker.lorem().word())
+                            .price(faker.number().randomDouble(2, 10, 400))
+                            .quantity(faker.number().numberBetween(20, 100))
+                            .category(categories.get(random.nextInt(categories.size())))
+                            .build())
+                    .collect(Collectors.toList());
+            productRepository.saveAll(products);
 
-        Random random = new Random();
-        for (int i = 0; i < max; i++) {
-            Product product = Product.builder().designation(faker.lorem().word()).price(faker.number().randomDouble(2, 10, 400)).quantity(faker.number().numberBetween(20, 100))
-                    .category(mapCategories.get(random.nextInt(mapCategories.size()))).build();
-            mapProducts.put(i, product);
-        }
+            log.info("Seeding products completed");
+        });
 
-        mapRoles.forEach((i, role) -> roleRepository.save(role));
-        mapUsers.forEach((i, user) -> userRepository.save(user));
-        mapCategories.forEach((i, category) -> categoryRepository.save(category));
-        mapProducts.forEach((i, product) -> productRepository.save(product));
+        CompletableFuture.allOf(usersFuture, productsFuture).join(); // Ensures both tasks are completed 
+
+        long timeTaken = (Instant.now().toEpochMilli() - start.toEpochMilli()) / 1000;
+
+        log.info("Seeding complete : time taken " + timeTaken + " s");
 
     }
 
