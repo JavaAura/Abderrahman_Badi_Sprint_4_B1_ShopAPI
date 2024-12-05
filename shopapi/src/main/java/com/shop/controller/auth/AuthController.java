@@ -9,6 +9,7 @@ import com.shop.service.interfaces.UserService;
 import com.shop.validation.UserValidationService;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import javax.validation.Valid;
 
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController // Marks this class as a RESTful controller.
 @RequestMapping("/api/auth")
 @AllArgsConstructor
+@Log4j2
 public class AuthController {
 
     private final UserValidationService userValidationService;
@@ -48,12 +50,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid UserDTO userDTO) {
-
+        log.info("UserDTO: " + userDTO.toString());
         if (userValidationService.isUsernameTaken(userDTO.getUsername())) {
+            log.info("Username is already taken");
             return ResponseEntity.badRequest().body("Username is already taken");
         }
 
         if (!userValidationService.doPasswordsMatch(userDTO.getPassword(), userDTO.getRepeatPassword())) {
+            log.info("Passwords do not match");
             return ResponseEntity.badRequest().body("Passwords do not match");
         }
 
