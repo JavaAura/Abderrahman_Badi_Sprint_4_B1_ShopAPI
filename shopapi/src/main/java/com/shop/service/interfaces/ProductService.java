@@ -16,9 +16,9 @@ public interface ProductService {
 
    ProductDTO getProductById(long id, String... with);
 
-   Page<ProductDTO> getAllProducts(Pageable pageable, String search);
+   Page<ProductDTO> getAllProducts(Pageable pageable, String search, Long categoryId);
 
-   Page<ProductDTO> getAllProducts(Pageable pageable, String search, String... with);
+   Page<ProductDTO> getAllProducts(Pageable pageable, String search, Long categoryId, String... with);
 
    Page<ProductDTO> getAllCategoryProducts(Pageable pageable, long id);
 

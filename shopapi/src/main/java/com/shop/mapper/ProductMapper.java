@@ -9,12 +9,19 @@ import org.springframework.stereotype.Component;
 import com.shop.dto.category.CategoryDTO;
 import com.shop.dto.product.ProductDTO;
 import com.shop.exceptions.InvalidDataException;
+import com.shop.exceptions.ResourceNotFoundException;
 import com.shop.model.Category;
 import com.shop.model.Product;
+import com.shop.repository.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
     private final List<String> VALID_INCLUDES = Arrays.asList("category");
+
+    private final CategoryRepository categoryRepository;
 
     public void verifyIncludes(String... with)
             throws InvalidDataException {
@@ -28,10 +35,13 @@ public class ProductMapper {
     }
 
     public Product convertToEntity(ProductDTO productDTO) {
+        Category category = categoryRepository.findById(productDTO.getCategory().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("category not found"));
+
         return Product.builder().designation(productDTO.getDesignation())
                 .price(productDTO.getPrice())
                 .quantity(productDTO.getQuantity())
-                .category(Category.builder().id(productDTO.getCategoryId()).build())
+                .category(category)
                 .build();
     }
 

@@ -3,6 +3,8 @@ package com.shop.dto.product;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
+import com.shop.dto.category.CategoryDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,5 +27,5 @@ public class UpdateProductDTO {
     @Min(value = 1, message = "Quantity must be greater than 0")
     private Integer quantity;
 
-    private Long categoryId; 
+    private CategoryDTO category; 
 }

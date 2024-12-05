@@ -19,6 +19,8 @@ import lombok.Setter;
 @Builder
 public class ProductDTO {
 
+    private Long id;
+    
     @NotNull(message = "Designation cannot be null")
     @Size(min = 3, max = 100, message = "Designation must be between 3 and 100 characters")
     private String designation;
@@ -30,8 +32,6 @@ public class ProductDTO {
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be greater than 0")
     private Integer quantity;
-
-    private Long categoryId; 
 
     private CategoryDTO category;
 
