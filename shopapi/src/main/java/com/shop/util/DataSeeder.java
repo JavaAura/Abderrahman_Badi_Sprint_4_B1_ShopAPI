@@ -61,7 +61,7 @@ public class DataSeeder {
             List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in hashing the passwords
                     .mapToObj(i -> User.builder()
                             .email(faker.internet().emailAddress())
-                            .userName(faker.name().username())
+                            .username(faker.name().username())
                             .password(passwordEncoder.encode("password")) // Expensive operation
                             .role(i == 0 ? adminRole : userRole) // First user is admin
                             .build())

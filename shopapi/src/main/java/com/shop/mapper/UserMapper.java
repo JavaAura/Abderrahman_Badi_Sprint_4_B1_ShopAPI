@@ -13,15 +13,14 @@ import com.shop.model.Role;
 import com.shop.model.User;
 import com.shop.service.interfaces.RoleService;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
     private final List<String> VALID_INCLUDES = Arrays.asList("role");
 
-    private RoleService roleService;
-
-    public UserMapper(RoleService roleService) {
-        this.roleService = roleService;
-    }
+    private final RoleService roleService;
 
     public void verifyIncludes(String... with)
             throws InvalidDataException {
@@ -39,7 +38,7 @@ public class UserMapper {
 
         return User.builder()
                 .email(userDTO.getEmail())
-                .userName(userDTO.getUserName())
+                .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
                 .role(role)
                 .build();
@@ -48,7 +47,7 @@ public class UserMapper {
     public UserDTO convertToDTO(User user) {
         return UserDTO.builder()
                 .email(user.getEmail())
-                .userName(user.getUserName())
+                .username(user.getUsername())
                 .build();
     }
 
@@ -72,7 +71,7 @@ public class UserMapper {
 
         return UserDTO.builder()
                 .email(user.getEmail())
-                .userName(user.getUserName())
+                .username(user.getUsername())
                 .role(roleDTO)
                 .build();
     }

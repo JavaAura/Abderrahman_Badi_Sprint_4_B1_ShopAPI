@@ -13,7 +13,7 @@ public class UserValidationService {
     private final UserRepository userRepository;
 
     public boolean isUsernameTaken(String username) {
-        return userRepository.findByUserName(username).isPresent();
+        return userRepository.findByUsername(username).isPresent();
     }
 
     public boolean doPasswordsMatch(String password, String repeatPassword) {

@@ -36,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(),
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername  (),
         loginRequest.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
@@ -49,7 +49,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid UserDTO userDTO) {
 
-        if (userValidationService.isUsernameTaken(userDTO.getUserName())) {
+        if (userValidationService.isUsernameTaken(userDTO.getUsername())) {
             return ResponseEntity.badRequest().body("Username is already taken");
         }
 

@@ -60,7 +60,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<CategoryDTO> getAllCategories(Pageable pageable, String search, String... with) {
         categoryMapper.verifyIncludes(with);
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+        Page<Category> categoryPage;
+
+        if (search != null && !search.isEmpty()) {
+            categoryPage = categoryRepository.findByNameContainingIgnoreCase(search, pageable);
+        } else {
+            categoryPage = categoryRepository.findAll(pageable);
+        }
+
         return categoryPage.map(category -> categoryMapper.convertToDTO(category, with));
     }
 
