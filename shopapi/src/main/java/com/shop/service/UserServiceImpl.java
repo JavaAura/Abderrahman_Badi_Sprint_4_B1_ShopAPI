@@ -15,7 +15,7 @@ import com.shop.repository.RoleRepository;
 import com.shop.repository.UserRepository;
 import com.shop.service.interfaces.UserService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -24,13 +24,13 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private BCryptPasswordEncoder passwordEncoder;
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserDTO getUserById(long id) throws ResourceNotFoundException {

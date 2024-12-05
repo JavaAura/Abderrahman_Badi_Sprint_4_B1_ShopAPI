@@ -1,11 +1,11 @@
 package com.shop.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.shop.dto.category.CategoryDTO;
+import com.shop.dto.category.UpdateCategoryDTO;
 import com.shop.exceptions.DuplicateResourceException;
 import com.shop.exceptions.ResourceNotFoundException;
 import com.shop.mapper.CategoryMapper;
@@ -13,7 +13,7 @@ import com.shop.model.Category;
 import com.shop.repository.CategoryRepository;
 import com.shop.service.interfaces.CategoryService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -22,14 +22,12 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private CategoryMapper categoryMapper;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public CategoryDTO getCategoryById(long id) {
@@ -40,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDTO getCategoryById(long id, String... with) {
+        categoryMapper.verifyIncludes(with);
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("category not found"));
         return categoryMapper.convertToDTO(category, with);
@@ -47,7 +46,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryDTO> getAllCategories(Pageable pageable, String search) {
-        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        Page<Category> categoryPage;
+        if (search != null && !search.isEmpty()) {
+            categoryPage = categoryRepository.findByNameContainingIgnoreCase(search, pageable);
+        } else {
+            categoryPage = categoryRepository.findAll(pageable);
+        }
+
         return categoryPage.map(category -> categoryMapper.convertToDTO(category));
     }
 
@@ -67,15 +73,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO updateCategory(long categoryId, CategoryDTO categoryDTO) {
+    public CategoryDTO updateCategory(long categoryId, UpdateCategoryDTO categoryDTO) {
         Category categoryDB = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("category not found"));
 
-        if (categoryDTO.getName() != null) {
-            categoryDTO.setName(categoryDTO.getName());
+        if (categoryDTO.getName() != null && !categoryDTO.getName().isEmpty()) {
+            categoryDB.setName(categoryDTO.getName());
         }
-        if (categoryDTO.getDescription() != null) {
-            categoryDTO.setDescription(categoryDTO.getDescription());
+        if (categoryDTO.getDescription() != null && !categoryDTO.getName().isEmpty()) {
+            categoryDB.setDescription(categoryDTO.getDescription());
         }
 
         return categoryMapper.convertToDTO(categoryRepository.save(categoryDB));
