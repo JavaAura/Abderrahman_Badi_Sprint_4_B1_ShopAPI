@@ -17,7 +17,7 @@ public class UserValidationService {
     }
 
     public boolean doPasswordsMatch(String password, String repeatPassword) {
-        return password.equals(repeatPassword);
+        return password.trim().equals(repeatPassword.trim());
     }
 
 }
