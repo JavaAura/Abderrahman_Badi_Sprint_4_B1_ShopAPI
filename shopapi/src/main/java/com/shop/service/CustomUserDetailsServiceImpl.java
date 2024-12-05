@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.shop.model.User;
 import com.shop.repository.UserRepository;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -22,10 +22,10 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

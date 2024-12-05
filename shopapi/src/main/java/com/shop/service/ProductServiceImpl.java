@@ -1,13 +1,12 @@
 package com.shop.service;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.shop.dto.product.ProductDTO;
+import com.shop.dto.product.UpdateProductDTO;
 import com.shop.exceptions.InvalidDataException;
 import com.shop.exceptions.ResourceNotFoundException;
 import com.shop.mapper.ProductMapper;
@@ -15,7 +14,7 @@ import com.shop.model.Product;
 import com.shop.repository.ProductRepository;
 import com.shop.service.interfaces.ProductService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -24,14 +23,12 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductRepository ProductRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductMapper ProductMapper;
+    private final ProductMapper productMapper;
 
     @Override
     public ProductDTO getProductById(long id) {
@@ -46,31 +43,38 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDTO> getAllProducts() {
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String search) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }
 
     @Override
-    public Page<ProductDTO> getAllProducts(String... with) {
+    public Page<ProductDTO> getAllProducts(Pageable pageable, String search, String... with) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllProducts'");
     }
 
     @Override
-    public ProductDTO addProduct(ProductDTO Product) {
+    public Page<ProductDTO> getAllCategoryProducts(Pageable pageable, long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllCategoryProducts'");
+    }
+
+
+    @Override
+    public ProductDTO addProduct(ProductDTO product) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addProduct'");
     }
 
     @Override
-    public ProductDTO updateProduct(long ProductId, ProductDTO Product) {
+    public ProductDTO updateProduct(long productId, UpdateProductDTO product) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'updateProduct'");
     }
 
     @Override
-    public void deleteProductById(long ProductId) {
+    public void deleteProductById(long productId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteProductById'");
     }

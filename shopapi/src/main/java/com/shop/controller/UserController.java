@@ -18,7 +18,7 @@ import com.shop.dto.user.UpdateUserDTO;
 import com.shop.dto.user.UserDTO;
 import com.shop.service.interfaces.UserService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * REST controller for managing User entities.
@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
  */
 @RestController // Marks this class as a RESTful controller.
 @RequestMapping("/api/admin/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;

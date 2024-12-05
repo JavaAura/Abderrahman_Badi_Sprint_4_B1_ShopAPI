@@ -6,7 +6,7 @@ import com.shop.model.Role;
 import com.shop.repository.RoleRepository;
 import com.shop.service.interfaces.RoleService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;

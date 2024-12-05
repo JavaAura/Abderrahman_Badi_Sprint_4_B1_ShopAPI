@@ -37,6 +37,9 @@ public class ProductMapper {
 
     public ProductDTO convertToDTO(Product product) {
         return ProductDTO.builder()
+                .designation(product.getDesignation())
+                .price(product.getPrice())
+                .quantity(product.getQuantity())
                 .build();
     }
 
