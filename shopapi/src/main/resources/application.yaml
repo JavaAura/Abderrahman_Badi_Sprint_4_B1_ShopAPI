@@ -11,10 +11,10 @@ spring:
   jackson:
     default-property-inclusion: NON_NULL
   profiles:
-    active: prod
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: ${SPRING_DDL_AUTO:create-drop}
     show-sql: true

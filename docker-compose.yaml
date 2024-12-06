@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  shopapi:
+    build:
+      context: ./shopapi 
+      dockerfile: Dockerfile
+    container_name: shopapi-container
+    ports:
+      - "8085:8085"  
+    environment:
+      SPRING_PROFILES_ACTIVE: prod 
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/shopapi
+      SPRING_DATASOURCE_USERNAME: shopapi
+      SPRING_DATASOURCE_PASSWORD: /run/secrets/db_password
+      SPRING_DDL_AUTO: validate
+    secrets:
+      - db_password
+
+    depends_on:
+      - db
+    networks:
+      - shopapi-network
+
+  db:
+    image: mysql:latest
+    volumes:
+      - mysql-data:/var/lib/mysql
+    container_name: mysql-db
+    environment:
+       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+       MYSQL_DATABASE: shopapi
+       MYSQL_USER: shopapi
+       MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_root_password
+      - db_password
+    ports:
+      - "3306:3306"
+    networks:
+      - shopapi-network
+    
+secrets:
+   db_password:
+     file: db_password.txt
+   db_root_password:
+     file: db_root_password.txt
+
+
+volumes:
+  mysql-data:
+
+networks:
+  shopapi-network:
+    driver: bridge
