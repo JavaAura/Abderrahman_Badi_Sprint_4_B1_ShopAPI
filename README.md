@@ -1,4 +1,4 @@
-# Simples API
+# Shop API
 
 A REST API for managing products, categories, and user roles in a secure and scalable e-commerce system, developed using Java and Spring Boot.
 
