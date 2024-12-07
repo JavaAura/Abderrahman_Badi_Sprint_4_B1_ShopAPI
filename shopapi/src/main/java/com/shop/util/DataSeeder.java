@@ -28,71 +28,71 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataSeeder {
 
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private CategoryRepository categoryRepository;
-    private ProductRepository productRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+        private RoleRepository roleRepository;
+        private UserRepository userRepository;
+        private CategoryRepository categoryRepository;
+        private ProductRepository productRepository;
+        private BCryptPasswordEncoder passwordEncoder;
 
-    public void seedDatabase(int max) {
-        Faker faker = new Faker(new Locale("en-US"));
+        public void seedDatabase(int max) {
+                Faker faker = new Faker(new Locale("en-US"));
 
-        Role role1 = Role.builder().name("ROLE_ADMIN").build();
-        Role role2 = Role.builder().name("ROLE_USER").build();
-        roleRepository.saveAll(Arrays.asList(role1, role2));
+                Role role1 = Role.builder().name("ROLE_ADMIN").build();
+                Role role2 = Role.builder().name("ROLE_USER").build();
+                roleRepository.saveAll(Arrays.asList(role1, role2));
 
+                Instant start = Instant.now();
+                List<Category> categories = IntStream.range(0, max).mapToObj(i -> Category.builder()
+                                .name(faker.lorem().word())
+                                .description(faker.lorem().sentence())
+                                .build()).collect(Collectors.toList());
+                categoryRepository.saveAll(categories);
 
+                CompletableFuture<Void> usersFuture = CompletableFuture.runAsync(() -> {
+                        log.info("Seeding users started...");
 
-        Instant start = Instant.now();
-        List<Category> categories = IntStream.range(0, max).mapToObj(i -> Category.builder()
-                .name(faker.lorem().word())
-                .description(faker.lorem().sentence())
-                .build()).collect(Collectors.toList());
-        categoryRepository.saveAll(categories);
+                        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                                        .orElseThrow(() -> new RuntimeException("Admin role not found"));
+                        Role userRole = roleRepository.findByName("ROLE_USER")
+                                        .orElseThrow(() -> new RuntimeException("User role not found"));
 
-        CompletableFuture<Void> usersFuture = CompletableFuture.runAsync(() -> {
-            log.info("Seeding users started...");
+                        List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in
+                                                                              // hashing the passwords
+                                        .mapToObj(i -> User.builder()
+                                                        .email(faker.internet().emailAddress())
+                                                        .username(faker.name().username())
+                                                        .password(passwordEncoder.encode("password")) // Expensive
+                                                                                                      // operation
+                                                        .role(i == 0 ? adminRole : userRole) // First user is admin
+                                                        .build())
+                                        .collect(Collectors.toList());
+                        userRepository.saveAll(users);
 
-			Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-					.orElseThrow(() -> new RuntimeException("Admin role not found"));
-			Role userRole = roleRepository.findByName("ROLE_USER")
-					.orElseThrow(() -> new RuntimeException("User role not found"));
+                        log.info("Seeding users completed");
+                });
 
-            List<User> users = IntStream.range(0, max).parallel() // Parallel stream to reduce time taken in hashing the passwords
-                    .mapToObj(i -> User.builder()
-                            .email(faker.internet().emailAddress())
-                            .username(faker.name().username())
-                            .password(passwordEncoder.encode("password")) // Expensive operation
-                            .role(i == 0 ? adminRole : userRole) // First user is admin
-                            .build())
-                    .collect(Collectors.toList());
-            userRepository.saveAll(users);
+                CompletableFuture<Void> productsFuture = CompletableFuture.runAsync(() -> {
+                        log.info("Seeding products started...");
+                        Random random = new Random();
+                        List<Product> products = IntStream.range(0, max)
+                                        .mapToObj(i -> Product.builder()
+                                                        .designation(faker.lorem().word())
+                                                        .price(faker.number().randomDouble(2, 10, 400))
+                                                        .quantity(faker.number().numberBetween(20, 100))
+                                                        .category(categories.get(random.nextInt(categories.size())))
+                                                        .build())
+                                        .collect(Collectors.toList());
+                        productRepository.saveAll(products);
 
-            log.info("Seeding users completed");
-        });
+                        log.info("Seeding products completed");
+                });
 
-        CompletableFuture<Void> productsFuture = CompletableFuture.runAsync(() -> {
-            log.info("Seeding products started...");
-            Random random = new Random();
-            List<Product> products = IntStream.range(0, max)
-                    .mapToObj(i -> Product.builder()
-                            .designation(faker.lorem().word())
-                            .price(faker.number().randomDouble(2, 10, 400))
-                            .quantity(faker.number().numberBetween(20, 100))
-                            .category(categories.get(random.nextInt(categories.size())))
-                            .build())
-                    .collect(Collectors.toList());
-            productRepository.saveAll(products);
+                CompletableFuture.allOf(usersFuture, productsFuture).join(); // Ensures both tasks are completed
 
-            log.info("Seeding products completed");
-        });
+                long timeTaken = (Instant.now().toEpochMilli() - start.toEpochMilli()) / 1000;
 
-        CompletableFuture.allOf(usersFuture, productsFuture).join(); // Ensures both tasks are completed 
+                log.info("Seeding complete : time taken " + timeTaken + " s");
 
-        long timeTaken = (Instant.now().toEpochMilli() - start.toEpochMilli()) / 1000;
-
-        log.info("Seeding complete : time taken " + timeTaken + " s");
-
-    }
+        }
 
 }
