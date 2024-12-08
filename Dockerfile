@@ -7,7 +7,8 @@ COPY shopapi/mvnw /shopapi/mvnw
 COPY shopapi/src /shopapi/src
 COPY shopapi/.mvn /shopapi/.mvn
 
-RUN mvn --version
+RUN chmod +x /shopapi/mvnw
+RUN /shopapi/mvnw clean package -DskipTests
 
 COPY shopapi/target/shopapi-*.jar /shopapi/shopapi.jar
 
