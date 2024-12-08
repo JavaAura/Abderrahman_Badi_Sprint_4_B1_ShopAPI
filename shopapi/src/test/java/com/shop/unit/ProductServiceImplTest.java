@@ -29,7 +29,6 @@ import com.shop.repository.CategoryRepository;
 import com.shop.repository.ProductRepository;
 import com.shop.service.ProductServiceImpl;
 
-
 public class ProductServiceImplTest {
     @Mock
     private ProductRepository productRepository;
@@ -49,7 +48,7 @@ public class ProductServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
+
         product = Product.builder()
                 .id(1L)
                 .designation("Test Product")
