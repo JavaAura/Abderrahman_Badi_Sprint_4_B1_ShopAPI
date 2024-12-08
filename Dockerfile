@@ -2,12 +2,10 @@ FROM openjdk:8-jdk-alpine
 
 WORKDIR /shopapi
 
-RUN ls -la
-
-COPY pom.xml /shopapi/pom.xml
-COPY mvnw /shopapi/mvnw
-COPY src /shopapi/src
-COPY .mvn /shopapi/.mvn
+COPY shopapi/pom.xml /shopapi/pom.xml
+COPY shopapi/mvnw /shopapi/mvnw
+COPY shopapi/src /shopapi/src
+COPY shopapi/.mvn /shopapi/.mvn
 
 RUN chmod +x /shopapi/mvnw
 RUN /shopapi/mvnw clean package -DskipTests
