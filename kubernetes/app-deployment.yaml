@@ -49,7 +49,6 @@ spec:
                   name : mysql-secrets
                   key :  password
             
-
 ---
 
 apiVersion: v1 # Kubernetes API version
